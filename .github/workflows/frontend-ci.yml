@@ -1,0 +1,13 @@
+name: Frontend CI (placeholder)
+
+on:
+  push:
+    paths:
+      - 'frontend/**'
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Frontend CI ready — will run when code exists."
