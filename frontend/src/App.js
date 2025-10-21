@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import styled from 'styled-components';
 import gsap from "gsap";
 import './App.css';
@@ -6,6 +6,8 @@ import Loading from './components/Loading';
 import github_img from './assets/github.png';
 import tomato_img from './assets/Hero_Image.png';
 import upload from './assets/upload.png';
+import {useDropzone} from 'react-dropzone'
+
 
 // --- Styled Components ---
 const Content = styled.div`
@@ -47,6 +49,11 @@ const Count = styled.p`
 function App() {
   const [counter, setCounter] = useState(0);
   const ctaButtonRef = useRef(null);
+  const onDrop = useCallback(acceptedFiles => {
+    // Do something with the files
+  }, [])
+  const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
+
 
   // Effect for the counter
   useEffect(() => {
@@ -95,20 +102,27 @@ function App() {
         <ProgressBar className="progress-bar" style={{ width: counter + "%" }}></ProgressBar>
         <Count className="count">{counter}%</Count>
       </Loading>
+      
 
       <Content className="content">
+        
         <div className='hero-section'>
-
+          
           {/* Left Column */}
-          <div className='left-column'>
+          <div {...getRootProps()} className='left-column'>
             <h1 className='title-main'>
               AI Tomato Ripeness<br />Detector
             </h1>
-            
-            <button className='cta-button' ref={ctaButtonRef}>
+            <input  {...getInputProps()} />
+            {
+              isDragActive ?
+                <p>Drop the files here ...</p> :
+                <p><button className='cta-button' ref={ctaButtonRef}>
               <img src={upload} alt="Upload Image" />
               <p>Upload Image</p>
-            </button>
+            </button></p>
+            }
+            
           </div>
 
           {/* Right Column */}
@@ -117,7 +131,7 @@ function App() {
               <img src={github_img} alt="GitHub Icon" />
               <p>GitHub</p>
             </a>
-            <img src={tomato_img} alt="Ripe tomatoes" />
+            <img src={tomato_img} alt="Ripe tomatoes" style={{height:"300px"}} />
           </div>
 
         </div>
