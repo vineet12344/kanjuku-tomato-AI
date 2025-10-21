@@ -103,7 +103,7 @@ body {
   flex: 1; /* Allows the column to take up available space */
   display: flex;
   flex-direction: column;
-  align-items: end;
+  align-items: flex-end;
 }
 
 .right-column img {
