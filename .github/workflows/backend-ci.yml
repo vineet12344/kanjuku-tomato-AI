@@ -1,0 +1,57 @@
+name: Python Backend CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - backend
+    paths:
+      - 'backend/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+      - backend
+    paths:
+      - 'backend/**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f backend/requirements.txt ]; then
+            pip install -r backend/requirements.txt
+          else
+            echo "requirements.txt not found in backend directory"
+            pip install -r requirements.txt
+          fi
+
+      - name: Run tests
+        run: |
+          if [ -d backend/tests/ ]; then
+            pytest backend/tests/
+          else
+            echo "Tests directory not found, running pytest in backend directory"
+            pytest backend/
+          fi
+
+      - name: Run linter
+        run: |
+          pip install flake8
+          flake8 backend/ --max-complexity=10 --max-line-length=120 || echo "Flake8 check completed"
