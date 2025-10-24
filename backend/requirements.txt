@@ -1,0 +1,24 @@
+# --- Web Framework ---
+fastapi
+uvicorn
+
+# --- ML / YOLO Inference ---
+torch
+torchvision
+ultralytics
+onnxruntime
+
+# --- Image Processing & Math ---
+numpy
+opencv-python
+matplotlib
+pillow
+
+# --- Utilities for File Uploads / Form Data ---
+python-multipart
+
+# --- Data Validation ---
+pydantic
+
+# --- Environment Variables ---
+python-dotenv
