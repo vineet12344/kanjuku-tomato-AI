@@ -55,3 +55,4 @@ jobs:
         run: |
           pip install flake8
           flake8 backend/ --max-complexity=10 --max-line-length=120 || echo "Flake8 check completed"
+          flake8 backend/ --max-complexity=10 --max-line-length=120 || echo "Flake8 check completed"
