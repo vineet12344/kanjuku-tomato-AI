@@ -27,6 +27,8 @@ This backend is designed for **easy integration** with web dashboards, IoT devic
 
 ## 🗂️ Folder Structure
 
+```
+
 backend/
 ├── app/
 │ ├── init.py
@@ -46,10 +48,10 @@ backend/
 ├── .env
 └── README.md
 
-
----
+```
 
 ## 🧩 Features
+
 - ✅ **YOLOv8 model integration** for object detection.
 - 🎨 **Annotated output images** with bounding boxes.
 - 🌈 **Color-coded boxes:**  
@@ -120,6 +122,9 @@ http://127.0.0.1:5000
 You should see:
 
 {"message": "Backend is alive"}
+
+
+
 
 📡 API Endpoints
 1️⃣ Health Check
