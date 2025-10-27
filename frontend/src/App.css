@@ -151,3 +151,79 @@ button.cta-button:hover {
   max-width: 100%;
   height: auto;
 }
+
+/* --- 📱 Mobile Responsive Styles --- */
+@media (max-width: 768px) {
+  body {
+    padding: 0;
+    margin: 0;
+    overflow-x: hidden;
+  }
+
+  .hero-section {
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem 1rem;
+    gap: 1.5rem;
+  }
+
+  .right-column{
+    width: 200%;
+  }
+
+  .left-column {
+    align-items: center;
+    text-align: center;
+    min-height: auto;
+    gap: 20px;
+  }
+
+  .title-main {
+    font-size: 42px;
+    line-height: 1.2;
+    width: auto;
+    text-align: center;
+  }
+
+  .github-link {
+    margin-bottom: 10%;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  .github-link img {
+    width: 22px;
+    height: 22px;
+  }
+
+  .cta-button {
+    width: 200px;
+    height: 55px;
+    font-size: 18px;
+  }
+
+  .cta-button img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .right-column {
+    align-items: center;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+
+  .right-column img {
+    width: 90%;
+    max-width: 350px;
+  }
+
+  .processing-view img {
+    margin-top: 20%;
+    width: 80%;
+  }
+
+  .processing-view {
+    min-height: 60vh;
+  }
+}

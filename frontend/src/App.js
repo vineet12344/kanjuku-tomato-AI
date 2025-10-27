@@ -38,6 +38,22 @@ function App() {
   const [uploadedFile, setUploadedFile] = useState(null);
   const [result, setResult] = useState(null);
 
+  // --- Handle file selection manually (from upload button in ResultsPage)
+  const handleRetry = (file) => {
+    if (!file) {
+      // Go back to home page
+      setResult(null);
+      setPage("hero");
+      return;
+    }
+
+    // New file selected — upload again
+    setUploadedFile(file);
+    setPage("processing");
+    handleUpload(file);
+  };
+
+  // --- Drag and drop handler (still works on hero page)
   const onDrop = useCallback((acceptedFiles) => {
     const file = acceptedFiles[0];
     file.preview = URL.createObjectURL(file);
@@ -48,6 +64,7 @@ function App() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
+  // --- Upload logic
   const handleUpload = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -60,6 +77,7 @@ function App() {
 
       if (!response.ok) throw new Error("Request failed");
       const data = await response.json();
+
       const formatted = {
         ripeness: "Ripe",
         count: data.detections.length,
@@ -71,7 +89,6 @@ function App() {
 
       setResult(formatted);
       setPage("results");
-
     } catch (error) {
       console.error("Error uploading image:", error);
       alert("Upload failed");
@@ -79,8 +96,7 @@ function App() {
     }
   };
 
-
-  // --- Counter animation ---
+  // --- Loading counter
   useEffect(() => {
     const count = setInterval(() => {
       setCounter((prev) => (prev < 100 ? prev + 1 : 100));
@@ -88,7 +104,7 @@ function App() {
     return () => clearInterval(count);
   }, []);
 
-  // --- GSAP page transition after load ---
+  // --- GSAP animation after loading
   useEffect(() => {
     if (counter === 100) {
       const tl = gsap.timeline();
@@ -99,15 +115,19 @@ function App() {
           y: "-100%",
           ease: "power3.inOut",
         })
-        .to(".content", {
-          duration: 0.8,
-          opacity: 1,
-          ease: "power2.out",
-        }, "-=0.5");
+        .to(
+          ".content",
+          {
+            duration: 0.8,
+            opacity: 1,
+            ease: "power2.out",
+          },
+          "-=0.5"
+        );
     }
   }, [counter]);
 
-  // --- GSAP between pages ---
+  // --- Page transition animation
   useEffect(() => {
     gsap.fromTo(
       ".page",
@@ -117,7 +137,7 @@ function App() {
   }, [page]);
 
   return (
-    <div>
+    <div style={{ overflow: "hidden" }}>
       {/* LOADING SCREEN */}
       <Loading>
         <ProgressBar className="progress-bar" style={{ width: counter + "%" }} />
@@ -134,8 +154,12 @@ function App() {
               isDragActive={isDragActive}
             />
           )}
-          {page === "processing" && uploadedFile && <ProcessingPage file={uploadedFile} />}
-          {page === "results" && result && <ResultsPage result={result} />}
+          {page === "processing" && uploadedFile && (
+            <ProcessingPage file={uploadedFile} />
+          )}
+          {page === "results" && result && (
+            <ResultsPage result={result} onRetry={handleRetry} />
+          )}
         </div>
       </Content>
     </div>
