@@ -27,11 +27,6 @@ async def predict(file: UploadFile = File(...)):
 
     return JSONResponse(content=result)
 
-
-
-
-
-
 @router.post("/predict/image")
 async def predict_image(file: UploadFile = File(...)):
     """
