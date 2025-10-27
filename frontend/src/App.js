@@ -1,15 +1,13 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import styled from 'styled-components';
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import styled from "styled-components";
 import gsap from "gsap";
-import './App.css';
-import Loading from './components/Loading';
-import Processing from './components/Processing'
-import github_img from './assets/github.png';
-import tomato_img from './assets/Hero_Image.png';
-import upload from './assets/upload.png';
-import { useDropzone } from 'react-dropzone';
+import { useDropzone } from "react-dropzone";
+import "./App.css";
+import Loading from "./components/Loading";
+import HeroPage from "./components/HeroPage";
+import ProcessingPage from "./components/ProcessingPage";
+import ResultsPage from "./components/ResultsPage";
 
-// --- Styled Components ---
 const Content = styled.div`
   opacity: 0;
   padding: 2rem;
@@ -22,7 +20,7 @@ const ProgressBar = styled.div`
   left: 0;
   top: 0;
   height: 100%;
-  background-color: #FF6347;
+  background-color: #ff6347;
 `;
 
 const Count = styled.p`
@@ -32,52 +30,55 @@ const Count = styled.p`
   color: #fff;
   transform: translateY(-15px);
   z-index: 2;
-  display: inline-block;
-  background-color: transparent;
 `;
 
 function App() {
   const [counter, setCounter] = useState(0);
+  const [page, setPage] = useState("hero"); // "hero" | "processing" | "results"
   const [uploadedFile, setUploadedFile] = useState(null);
-  const [processing, setProcessing] = useState(false);
   const [result, setResult] = useState(null);
-  const ctaButtonRef = useRef(null);
 
-  // --- Dropzone handler ---
   const onDrop = useCallback((acceptedFiles) => {
     const file = acceptedFiles[0];
     file.preview = URL.createObjectURL(file);
     setUploadedFile(file);
+    setPage("processing");
     handleUpload(file);
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
-  // --- Upload and backend communication ---
   const handleUpload = async (file) => {
-    setProcessing(true);
-    setResult(null);
-
     const formData = new FormData();
-    formData.append("image", file);
+    formData.append("file", file);
 
     try {
-      const response = await fetch("http://localhost:5000/predict", {
+      const response = await fetch("http://localhost:8000/api/predict", {
         method: "POST",
         body: formData,
       });
 
-      // Assuming backend sends JSON + base64 image:
-      // { "ripeness": "ripe", "confidence": 0.95, "output_image": "data:image/png;base64,..." }
+      if (!response.ok) throw new Error("Request failed");
       const data = await response.json();
-      setResult(data);
+      const formatted = {
+        ripeness: "Ripe",
+        count: data.detections.length,
+        confidence:
+          data.detections.reduce((acc, d) => acc + d.confidence, 0) /
+          data.detections.length,
+        output_image: `data:image/jpeg;base64,${data.annotated_image}`,
+      };
+
+      setResult(formatted);
+      setPage("results");
+
     } catch (error) {
       console.error("Error uploading image:", error);
-      alert("Error uploading image");
-    } finally {
-      setProcessing(false);
+      alert("Upload failed");
+      setPage("hero");
     }
   };
+
 
   // --- Counter animation ---
   useEffect(() => {
@@ -87,6 +88,7 @@ function App() {
     return () => clearInterval(count);
   }, []);
 
+  // --- GSAP page transition after load ---
   useEffect(() => {
     if (counter === 100) {
       const tl = gsap.timeline();
@@ -105,55 +107,36 @@ function App() {
     }
   }, [counter]);
 
+  // --- GSAP between pages ---
+  useEffect(() => {
+    gsap.fromTo(
+      ".page",
+      { opacity: 0, y: 40 },
+      { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }
+    );
+  }, [page]);
+
   return (
     <div>
-      {/* --- LOADING SCREEN --- */}
-      <Loading key="loading">
-        <ProgressBar className="progress-bar" style={{ width: counter + "%" }}></ProgressBar>
+      {/* LOADING SCREEN */}
+      <Loading>
+        <ProgressBar className="progress-bar" style={{ width: counter + "%" }} />
         <Count className="count">{counter}%</Count>
       </Loading>
 
-      {/* --- MAIN CONTENT --- */}
+      {/* MAIN CONTENT */}
       <Content className="content">
-        <div className="hero-section">
-          {/* LEFT COLUMN */}
-          <div {...getRootProps()} className="left-column">
-            <h1 className="title-main">
-              AI Tomato Ripeness<br />Detector
-            </h1>
-            <input {...getInputProps()} />
-            {isDragActive ? (
-              <p>Drop the files here...</p>
-            ) : (
-              <p>
-                <button className="cta-button" ref={ctaButtonRef}>
-                  <img src={upload} alt="Upload Image" />
-                  <p>Upload Image</p>
-                </button>
-              </p>
-            )}
-          </div>
-
-          {/* RIGHT COLUMN */}
-          <div className="right-column">
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="github-link">
-              <img src={github_img} alt="GitHub Icon" />
-              <p>GitHub</p>
-            </a>
-            <img src={tomato_img} alt="Ripe tomatoes" style={{ height: "300px" }} />
-          </div>
+        <div className="page">
+          {page === "hero" && (
+            <HeroPage
+              getRootProps={getRootProps}
+              getInputProps={getInputProps}
+              isDragActive={isDragActive}
+            />
+          )}
+          {page === "processing" && uploadedFile && <ProcessingPage file={uploadedFile} />}
+          {page === "results" && result && <ResultsPage result={result} />}
         </div>
-
-        {/* --- CONDITIONAL RENDER --- */}
-        {uploadedFile && processing && <Processing file={uploadedFile} />}
-        {result && (
-          <div className="results-section">
-            <h2>Detection Results</h2>
-            <p><b>Ripeness:</b> {result.ripeness}</p>
-            <p><b>Confidence:</b> {(result.confidence * 100).toFixed(2)}%</p>
-            <img src={result.output_image} alt="Processed Output" style={{ maxWidth: "400px", marginTop: "20px" }} />
-          </div>
-        )}
       </Content>
     </div>
   );
