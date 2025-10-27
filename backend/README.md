@@ -27,7 +27,7 @@ This backend is designed for **easy integration** with web dashboards, IoT devic
 
 ## 🗂️ Folder Structure
 
----
+```
 
 backend/
 ├── app/
@@ -48,9 +48,10 @@ backend/
 ├── .env
 └── README.md
 
----
+```
 
 ## 🧩 Features
+
 - ✅ **YOLOv8 model integration** for object detection.
 - 🎨 **Annotated output images** with bounding boxes.
 - 🌈 **Color-coded boxes:**  
