@@ -27,6 +27,8 @@ This backend is designed for **easy integration** with web dashboards, IoT devic
 
 ## 🗂️ Folder Structure
 
+---
+
 backend/
 ├── app/
 │ ├── init.py
@@ -45,7 +47,6 @@ backend/
 ├── Dockerfile
 ├── .env
 └── README.md
-
 
 ---
 
@@ -120,6 +121,9 @@ http://127.0.0.1:5000
 You should see:
 
 {"message": "Backend is alive"}
+
+
+
 
 📡 API Endpoints
 1️⃣ Health Check
